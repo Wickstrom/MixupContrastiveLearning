@@ -18,9 +18,10 @@ evaluated with a 1-nearest-neighbor classifier on the encoder embeddings.
 
 ## Installation
 
+The package is not yet published on PyPI; install directly from GitHub:
+
 ```bash
-pip install mixupcl                    # from PyPI
-pip install git+https://github.com/Wickstrom/MixupContrastiveLearning.git  # from GitHub
+pip install git+https://github.com/Wickstrom/MixupContrastiveLearning.git
 ```
 
 Or from a local clone:
