@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mixupcl"
+version = "0.1.0"
+description = "Mixup contrastive learning (MNT-Xent) for self-supervised representation learning of time series"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kristoffer Wickstrøm" }]
+requires-python = ">=3.10"
+keywords = [
+    "time-series",
+    "contrastive-learning",
+    "mixup",
+    "self-supervised-learning",
+    "representation-learning",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "scikit-learn>=1.1",
+    "sktime>=0.14",
+    "torch>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+mcl = "mcl.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Wickstrom/MixupContrastiveLearning"
+Repository = "https://github.com/Wickstrom/MixupContrastiveLearning"
+Paper = "https://doi.org/10.1016/j.patrec.2022.02.007"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcl"]
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: tests that download real datasets (run with --run-integration)",
+]
