@@ -26,4 +26,4 @@ jobs:
           ruff check .
           ruff format --check .
       - name: Test
-        run: pytest -v
+        run: pytest -v --cov=mcl --cov-report=term-missing --cov-fail-under=90

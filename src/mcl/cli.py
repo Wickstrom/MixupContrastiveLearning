@@ -101,12 +101,15 @@ def _train_command(args: argparse.Namespace) -> None:
 def _save_history(history: dict, path: str) -> None:
     import csv
 
-    with open(path, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["epoch", "loss", "accuracy"])
-        for i, loss in enumerate(history["epoch_losses"]):
-            acc = history["accuracies"][i] if i < len(history["accuracies"]) else ""
-            writer.writerow([i, loss, acc])
+    try:
+        with open(path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["epoch", "loss", "accuracy"])
+            for i, loss in enumerate(history["epoch_losses"]):
+                acc = history["accuracies"][i] if i < len(history["accuracies"]) else ""
+                writer.writerow([i, loss, acc])
+    except OSError as exc:
+        raise SystemExit(f"Could not write history to {path}: {exc}") from exc
     print(f"History saved to {path}")
 
 

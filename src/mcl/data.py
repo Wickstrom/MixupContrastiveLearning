@@ -5,7 +5,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
 
 __all__ = ["TimeSeriesDataset", "load_dataset", "to_numpy3d"]
@@ -42,6 +41,8 @@ def to_numpy3d(X) -> np.ndarray:
             return arr
         raise ValueError(f"Expected a 2D or 3D array, got {arr.ndim}D.")
     if isinstance(X, pd.DataFrame):
+        if X.shape[0] == 0 or X.shape[1] == 0:
+            raise ValueError("Cannot convert an empty DataFrame to a 3D array.")
         if isinstance(X.index, pd.MultiIndex):
             return _multiindex_to_numpy3d(X)
         if isinstance(X.iloc[0, 0], (pd.Series, np.ndarray, list)):
@@ -56,7 +57,8 @@ def to_numpy3d(X) -> np.ndarray:
 def _encode_labels(y) -> np.ndarray:
     if isinstance(y, pd.Series):
         y = y.to_numpy()
-    return LabelEncoder().fit_transform(np.asarray(y).astype(str)).astype(np.int64)
+    _, labels = np.unique(np.asarray(y), return_inverse=True)
+    return labels.astype(np.int64).ravel()
 
 
 def load_dataset(name: str, split: str = "train", extract_path=None):
@@ -97,7 +99,8 @@ class TimeSeriesDataset(Dataset):
     ----------
     x : array-like
         Time series data, any format accepted by :func:`to_numpy3d`
-        (numpy array, nested/wide pandas dataframe, or torch tensor).
+        (numpy array or nested/wide pandas DataFrame; torch tensors are
+        passed through as-is).
     y : array-like
         Labels.
     device : str or torch.device, optional
