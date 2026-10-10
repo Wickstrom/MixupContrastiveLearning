@@ -33,7 +33,6 @@ def test_resolve_device():
 
 def test_train_reduces_loss(synthetic_data):
     torch.manual_seed(0)
-    np.random.seed(0)
     x, y = synthetic_data
     train_set = TimeSeriesDataset(x, y)
     test_set = TimeSeriesDataset(x, y)
@@ -42,17 +41,19 @@ def test_train_reduces_loss(synthetic_data):
         model,
         train_set,
         test_set,
-        epochs=15,
+        epochs=30,
         alpha=1.0,
         device="cpu",
         verbose=False,
         log_every=1000,
     )
-    assert len(history["epoch_losses"]) == 15
-    assert len(history["losses"]) == 15
-    assert len(history["accuracies"]) == 15
+    assert len(history["epoch_losses"]) == 30
+    assert len(history["losses"]) == 30
+    assert len(history["accuracies"]) == 30
     assert np.isfinite(history["losses"]).all()
-    assert history["epoch_losses"][-1] < history["epoch_losses"][0]
+    first = np.mean(history["epoch_losses"][:5])
+    last = np.mean(history["epoch_losses"][-5:])
+    assert last < 0.9 * first
     assert all(0.0 <= a <= 1.0 for a in history["accuracies"])
 
 
@@ -96,3 +97,27 @@ def test_evaluate_returns_accuracy(synthetic_data):
     acc = evaluate(model, train_set, test_set, device="cpu")
     assert isinstance(acc, float)
     assert 0.0 <= acc <= 1.0
+
+
+def test_resolve_device_auto():
+    assert resolve_device("auto") in ("cpu", "cuda")
+
+
+def test_train_verbose_logging(synthetic_data, capsys):
+    torch.manual_seed(0)
+    np.random.seed(0)
+    x, y = synthetic_data
+    train_set = TimeSeriesDataset(x, y)
+    model = FCN(n_channels=1)
+    train(
+        model,
+        train_set,
+        test_set=train_set,
+        epochs=2,
+        device="cpu",
+        verbose=True,
+        log_every=1,
+    )
+    out = capsys.readouterr().out
+    assert "epoch" in out
+    assert "accuracy=" in out

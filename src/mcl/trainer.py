@@ -27,7 +27,7 @@ def mixup_batch(x: torch.Tensor, alpha: float):
     ``x_aug = lam * x + (1 - lam) * x[perm]`` and returns
     ``(x_aug, x_2, lam)`` where ``x_2 = x[perm]``.
     """
-    lam = float(np.random.beta(alpha, alpha))
+    lam = float(torch.distributions.Beta(alpha, alpha).sample())
     x_2 = x[torch.randperm(x.shape[0], device=x.device)]
     x_aug = lam * x + (1 - lam) * x_2
     return x_aug, x_2, lam
